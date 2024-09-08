@@ -121,6 +121,10 @@ local function is_rt_valid(rt)
     return value_in_list(rt, { "node", "deno", "bun" })
 end
 
+local function is_installed(exec)
+    return vim.fn.executable(exec) == 1
+end
+
 function M.add_inlay_hints(rt, showVariables, showOrder)
 
     if is_rt_valid(rt) == false then
@@ -141,6 +145,15 @@ function M.add_inlay_hints(rt, showVariables, showOrder)
     if mappedRt == "node" then
         mappedRt = "tsx"
     end
+    if mappedRt == "tsx" and not is_installed(mappedRt) then
+        vim.notify("TSX is being installed")
+        os.execute("npm i -g tsx@4.7.0 > /dev/null 2>&1")
+        vim.notify("TSX is installed")
+    end
+    if not is_installed(mappedRt) then
+        vim.notify(mappedRt .. " is not available in the systems PATH. Please install it.")
+        return
+    end
     local plugin_dir = get_plugin_directory()
     local envs = "CLI=" .. mappedRt .. " FILE=" .. file_path
     if showOrder then
@@ -148,6 +161,7 @@ function M.add_inlay_hints(rt, showVariables, showOrder)
     end
     local command = envs .. " node " .. plugin_dir .. separator .. "ts-worksheet-cli.js > /dev/null 2>&1"
     local json_file_path = file_dir .. separator .. ".ws.data.json"
+
     local r = os.execute(command)
     if not (r == 0) then
         vim.notify("An error occurred running ts-worksheet. Please file an issue if you think this should have worked properly", vim.log.levels.ERROR)
