@@ -8,10 +8,19 @@ local namespace = vim.api.nvim_create_namespace("tsw")
 local function on_save()
     local bufnr = vim.api.nvim_get_current_buf()
     vim.diagnostic.reset(namespace, bufnr)
+
+    -- Get the first line of the buffer
+    local first_line = vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)[1]
+    -- Check if the first line starts with "//ts-worksheet"
+    if first_line and first_line:match("^//ts%-worksheet-with-variables") then
+        M.add_inlay_hints("node", true)
+    elseif first_line and first_line:match("^//ts%-worksheet") then
+        M.add_inlay_hints("node", false)
+    end
 end
 
 vim.api.nvim_create_autocmd("BufWritePost", {
-    pattern = {"*.ts", "*.js"},
+    pattern = { "*.ts", "*.js" },
     callback = on_save,
 })
 
@@ -98,7 +107,27 @@ local function get_plugin_directory()
     return dir
 end
 
+-- Function to check if a value is in a list (table)
+local function value_in_list(value, list)
+    for _, v in ipairs(list) do
+        if v == value then
+            return true
+        end
+    end
+    return false
+end
+
+local function is_rt_valid(rt)
+    return value_in_list(rt, { "node", "deno", "bun" })
+end
+
 function M.add_inlay_hints(rt, showVariables)
+
+    if is_rt_valid(rt) == false then
+        vim.notify("Only the runtimes 'node', 'bun' or 'deno' are allowed as 'rt' parameter", vim.log.levels.ERROR)
+        return
+    end
+
     local bufnr = vim.api.nvim_get_current_buf()
 
     local singleLines = M.find_lines_with_comment_suffix()
@@ -107,14 +136,21 @@ function M.add_inlay_hints(rt, showVariables)
 
     vim.diagnostic.reset(namespace, bufnr)
 
-    local plugin_dir = get_plugin_directory()
-    local command = "CLI=" .. rt .. " FILE=" .. file_path .. " node " .. plugin_dir .. separator .."ts-worksheet-cli.js > /dev/null 2>&1"
-    local json_file_path = file_dir .. separator ..".ws.data.json"
-    local r = os.execute(command)
+    local mappedRt = rt
 
+    if mappedRt == "node" then
+        mappedRt = "tsx"
+    end
+    local plugin_dir = get_plugin_directory()
+    local command = "CLI=" .. mappedRt .. " FILE=" .. file_path .. " node " .. plugin_dir .. separator .. "ts-worksheet-cli.js > /dev/null 2>&1"
+    local json_file_path = file_dir .. separator .. ".ws.data.json"
+    local r = os.execute(command)
+    if not (r == 0) then
+        vim.notify("An error occurred running ts-worksheet. Please file an issue if you think this should have worked properly", vim.log.levels.ERROR)
+        return
+    end
     local file_content = read_file_to_string(json_file_path)
     os.remove(json_file_path)
-
 
     local response = vim.json.decode(file_content)
     local data = response.data
@@ -122,7 +158,7 @@ function M.add_inlay_hints(rt, showVariables)
 
     if error then
         if error.message then
-            vim.notify("An error occurred. Maybe your TypeScript file is not valid? Otherwise file an issue: "..error.message, vim.log.levels.ERROR)
+            vim.notify("An error occurred. Maybe your TypeScript file is not valid? Otherwise file an issue: " .. error.message, vim.log.levels.ERROR)
         end
         return
     end
@@ -179,7 +215,7 @@ vim.api.nvim_create_user_command("Tsw", function(opts)
         args[key] = value
     end
 
-    local rt = "tsx"
+    local rt = "node"
     local show_variables = args["show_variables"] == "true"
     if args["rt"] then
         rt = args["rt"]
