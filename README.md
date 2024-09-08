@@ -22,7 +22,7 @@ require('ts-worksheet').setup({
 Just call `:Tsw` in a `js` or `ts` file to run the worksheet. By default it uses `node` as runtime and does not show the results of variables.
 
 ### All options
-`Tsw rt=[bun|node|deno] show_variables=[true|false]`
+`Tsw rt=[bun|node|deno] show_variables=[true|false] show_order=[true|false]`
 
 ### Defaults:
-`Tsw rt=node show_variables=false`
+`Tsw rt=node show_variables=false show_order=false`

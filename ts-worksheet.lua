@@ -12,10 +12,10 @@ local function on_save()
     -- Get the first line of the buffer
     local first_line = vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)[1]
     -- Check if the first line starts with "//ts-worksheet"
-    if first_line and first_line:match("^//ts%-worksheet-with-variables") then
-        M.add_inlay_hints("node", true)
+    if first_line and first_line:match("^//ts%-worksheet%-with%-variables") then
+        M.add_inlay_hints("node", true, false)
     elseif first_line and first_line:match("^//ts%-worksheet") then
-        M.add_inlay_hints("node", false)
+        M.add_inlay_hints("node", false, false)
     end
 end
 
@@ -121,7 +121,7 @@ local function is_rt_valid(rt)
     return value_in_list(rt, { "node", "deno", "bun" })
 end
 
-function M.add_inlay_hints(rt, showVariables)
+function M.add_inlay_hints(rt, showVariables, showOrder)
 
     if is_rt_valid(rt) == false then
         vim.notify("Only the runtimes 'node', 'bun' or 'deno' are allowed as 'rt' parameter", vim.log.levels.ERROR)
@@ -142,7 +142,11 @@ function M.add_inlay_hints(rt, showVariables)
         mappedRt = "tsx"
     end
     local plugin_dir = get_plugin_directory()
-    local command = "CLI=" .. mappedRt .. " FILE=" .. file_path .. " node " .. plugin_dir .. separator .. "ts-worksheet-cli.js > /dev/null 2>&1"
+    local envs = "CLI=" .. mappedRt .. " FILE=" .. file_path
+    if showOrder then
+        envs = envs .. " SHOW_ORDER=true"
+    end
+    local command = envs .. " node " .. plugin_dir .. separator .. "ts-worksheet-cli.js > /dev/null 2>&1"
     local json_file_path = file_dir .. separator .. ".ws.data.json"
     local r = os.execute(command)
     if not (r == 0) then
@@ -217,14 +221,12 @@ vim.api.nvim_create_user_command("Tsw", function(opts)
 
     local rt = "node"
     local show_variables = args["show_variables"] == "true"
+    local show_order = args["show_order"] == "true"
     if args["rt"] then
         rt = args["rt"]
     end
 
-    if args["show_variables"] then
-
-    end
-    M.add_inlay_hints(rt, show_variables)
+    M.add_inlay_hints(rt, show_variables, show_order)
 end, { nargs = "*" })
 
 return M
