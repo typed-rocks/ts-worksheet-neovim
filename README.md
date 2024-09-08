@@ -8,9 +8,7 @@ If you want to use `bun` or `deno` to run your code, the binaries have to be ava
 ## Setup
 You don't need any setup to start using it. So just require it:
 ```lua
-require('ts-worksheet').setup({
-    type = vim.diagnostic.severity.INFO
-})
+require('ts-worksheet')
 ```
 
 If you want to change the diagnostics color of the output, you can use a setup like this:
