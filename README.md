@@ -1,5 +1,9 @@
 <h1 align="center">Tsw - Live Results In Neovim</h1>
-A plugin to show the result of your TypeScript or JavaScript code right beside your code in your neovim editor. Supporting NodeJs, Deno and Bun
+<h3 align="center">A plugin to show the result of your TypeScript or JavaScript code right beside your code in your neovim editor.</h3>
+
+<div align="center">
+<img src="imgs/support.png" width="200" alt="Supported Runtimes" />
+</div>
 
 ![main.png](imgs/main.png)
 ## Installation
