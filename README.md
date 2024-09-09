@@ -1,8 +1,8 @@
 <h1 align="center">Tsw - Live Results In Neovim</h1>
-<h3 align="center">A plugin to show the result of your TypeScript or JavaScript code right beside your code in your neovim editor.</h3>
-
 <div align="center">
 <img src="imgs/main.png" width="500" />
+</div>
+<div align="center">
 <img src="imgs/support.png" width="200" alt="Supported Runtimes" />
 </div>
 
