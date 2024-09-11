@@ -1,0 +1,63 @@
+*tsw.txt*	For Neovim version 0.7 or later	Last change: 2024
+
+TSW - TYPESCRIPT WORKSHEET                                              *tsw*
+
+1. Introduction                      |tsw-introduction|
+2. Installation                      |tsw-installation|
+3. Configuration                     |tsw-configuration|
+4. Usage                             |tsw-usage|
+5. Commands                          |tsw-commands|
+
+==============================================================================
+1. Introduction                                                *tsw-introduction*
+
+Tsw (TypeScript Worksheet) is a Neovim plugin that provides live results for
+TypeScript and JavaScript code directly in your editor.
+
+==============================================================================
+2. Installation                                                *tsw-installation*
+
+Using Lazy.nvim:
+>
+    {
+      "yourusername/ts-worksheet-neovim",
+      config = function()
+        require("tsw").setup({
+          -- your configuration here
+        })
+      end
+    }
+<
+==============================================================================
+3. Configuration                                              *tsw-configuration*
+
+You can configure Tsw by passing a table to the setup function:
+>
+    require("tsw").setup({
+      severity = vim.diagnostic.severity.INFO
+    })
+<
+Options:
+    • severity: The severity level for diagnostics. Default is INFO.
+
+==============================================================================
+4. Usage                                                            *tsw-usage*
+
+To use Tsw in a TypeScript or JavaScript file:
+
+1. Add `//ts-worksheet` at the beginning of your file to automatically run Tsw
+   on save.
+2. Use the `:Tsw` command with optional parameters.
+
+==============================================================================
+5. Commands                                                        *tsw-commands*
+
+:Tsw [options]                                                            *:Tsw*
+    Run Tsw on the current buffer.
+    Options:
+        rt=[bun|node|deno]            Set the runtime
+        show_variables=[true|false]   Show variable values
+        show_order=[true|false]       Show execution order
+
+ vim:tw=78:ts=8:ft=help:norl:
+
