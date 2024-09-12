@@ -29,6 +29,23 @@ require('ts-worksheet').setup({
 })
 ```
 
+### Using [Lazy.nvim](https://github.com/folke/lazy.nvim)
+
+Add the following to your Neovim configuration:
+
+```lua
+    {
+        "typed-rocks/ts-worksheet-neovim",
+        opts = {
+            severity = vim.diagnostic.severity.WARN,
+        },
+        config = function(_, opts)
+            require("tsw").setup(opts)
+        end
+    },
+
+```
+
 ## How To Use Other Runtimes
 
 Just make sure to have `bun` or `deno` available in your systems `PATH`.
@@ -45,3 +62,4 @@ By default it uses `node` as runtime and does not show the results of variables.
 ### Defaults:
 
 `Tsw rt=node show_variables=false show_order=false`
+
